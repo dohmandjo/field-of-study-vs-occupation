@@ -103,3 +103,4 @@ async def predict(user_input: UserInput):
 @app.get("/favicon.ico")
 async def favicon():
     return {}
+
