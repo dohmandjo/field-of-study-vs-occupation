@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 // import reactLogo from './assets/react.svg'
 // import viteLogo from '/vite.svg'
 import './App.css'
+import { FaCheckCircle } from 'react-icons/fa';
 
 
 // Helper function to capitalize the first letter of each word in a string
@@ -37,6 +38,9 @@ const initialState = {
 function App() {
   // React state hook to manage for data
   const [formData, setFormData] = useState(initialState);
+  const [prediction, setPrediction] = useState<number | null>(null);
+  const [probability, setProbability] = useState<number | null>(null);
+  const [topFeatures, setTopFeatures] = useState<string[]>([])
 
   // Handle changes in any form input field
   const handleChange = (
@@ -81,7 +85,9 @@ function App() {
       }
 
       const result = await response.json();
-      alert(`Prediction result: ${result.prediction}`);
+      setPrediction(result.prediction);
+      setProbability(result.probability);
+      setTopFeatures(result.top_features || []);
     } catch (error) {
       console.error("Prediction error:", error);
       alert("There was an error submitting the form. Please try again.");
@@ -134,6 +140,41 @@ function App() {
           Predict
         </button>
       </form>
+
+            {/* Prediction Result Display */}
+      {prediction !== null && (
+        <div className="mt-6 p-4 max-w-xl bg-white rounded shadow">
+          <div className="flex items-center space-x-3">
+            {prediction === 1 ? (
+              <FaCheckCircle {...({ className: "text-green-500 text-xl" } as any)} />
+            ) : (
+              <FaCheckCircle {...({ className: "text-green-500 text-xl" } as any)} />
+            )}
+            <h3 className="text-lg font-semibold">
+              {prediction === 1
+                ? "You're likely to change careers."
+                : "You're not likely to change careers."}
+            </h3>
+          </div>
+
+          {probability !== null && (
+            <p className="mt-2 text-gray-700">
+              Probability: <strong>{(probability * 100).toFixed(1)}%</strong>
+            </p>
+          )}
+
+          {topFeatures.length > 0 && (
+            <div className="mt-2">
+              <p className="font-medium text-gray-800">Top 3 influencing factors:</p>
+              <ul className="list-disc pl-5 text-gray-600">
+                {topFeatures.map((feature, index) => (
+                  <li key={index}>{feature}</li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }

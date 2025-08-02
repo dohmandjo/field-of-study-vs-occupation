@@ -95,7 +95,7 @@ async def predict(user_input: UserInput):
     result = {
         "prediction": int(row["prediction"]),
         "probability_0": float(row["probability"][0]),
-        "probability_1": float(row["probability"][1])
+        "probability": float(row["probability"][1])
     }
     return result
     # Here you would typically load your model and make a prediction
