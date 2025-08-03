@@ -9,7 +9,6 @@ from pyspark.ml.feature import VectorAssembler
 from pyspark.ml import Pipeline
 from fastapi.middleware.cors import CORSMiddleware
 
-
 app = FastAPI()
 spark = SparkSession.builder.appName("ChangeCareerAPI").getOrCreate()
 model = LogisticRegressionModel.load("../../career_prediction_model")
@@ -49,7 +48,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
 
 @app.post("/predict")
 async def predict(user_input: UserInput):
