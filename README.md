@@ -6,6 +6,7 @@ This is a full-stack data engineering and machine learning project that predicts
 ## 📁 Project Structure
 
 /1st-DE-Project-FieldOfStudy-Occupation
+
 ├── career_prediction_model/
 │ └── data/ ← Saved PySpark ML model and preprocessors
 │ └── metadata/
