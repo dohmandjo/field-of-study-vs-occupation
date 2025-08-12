@@ -16,19 +16,27 @@ This is a full-stack data engineering and machine learning project that predicts
 ├──Data/
 
 │ └── raw/
+
 │ └── cleaned/
+
 ├──node_modules
+
 ├── notebooks/
+
 │ └── 01_data_loading_and_exploration.ipynb
+
 │ └── 02_modeling_career_change.ipynb
 
 ├── ui/
 
 │ ├── api/ ← FastAPI backend
+
 │ ├── api_client/ ← Django API client for the FastAPI backend
+
 │ ├── career_predictor_ui/ ← Vite + Tailwind CSS frontend
 
 ├── README.md
+
 └── requirements.txt
 
 
