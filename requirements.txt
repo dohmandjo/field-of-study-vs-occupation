@@ -1,0 +1,25 @@
+
+---
+
+### 📦 Final `requirements.txt`
+
+```txt
+# Python core
+pandas
+numpy
+
+# PySpark ML and processing
+pyspark
+
+# FastAPI and server
+fastapi
+uvicorn
+
+# For handling form/multipart data
+python-multipart
+
+# Django database and admin
+Django>=4.2
+
+# Environment variable support
+python-dotenv
