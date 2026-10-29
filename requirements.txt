@@ -1,5 +1,6 @@
 # Runtime: training (ml/), API (api/). Needs Java 17+ for PySpark.
 pyspark>=3.5,<4
+setuptools; python_version >= "3.12"   # pyspark 3.5 still imports distutils
 numpy>=1.26
 fastapi>=0.110
 uvicorn[standard]>=0.29
