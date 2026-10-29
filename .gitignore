@@ -26,3 +26,8 @@ dist/
 .DS_Store
 .idea/
 .vscode/
+
+# Old outputs from before the ml/ refactor (kept locally, no longer tracked)
+data/*.csv
+career_prediction_model/
+ui/
