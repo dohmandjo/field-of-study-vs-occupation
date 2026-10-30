@@ -1,0 +1,337 @@
+import React, { useState } from 'react';
+// import reactLogo from './assets/react.svg'
+// import viteLogo from '/vite.svg'
+import './App.css'
+import { FaCheckCircle } from 'react-icons/fa';
+
+// Base URL of the FastAPI service (set VITE_API_URL in frontend/.env, see .env.example)
+const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:8001';
+
+// The model only knows these categories (see data/raw/*.csv); a dropdown avoids unseen free-text values
+const FIELDS_OF_STUDY = ['Arts', 'Biology', 'Business', 'Computer Science', 'Economics', 'Education', 'Law', 'Mechanical Engineering', 'Medicine', 'Psychology'];
+const OCCUPATIONS = ['Artist', 'Biologist', 'Business Analyst', 'Doctor', 'Economist', 'Lawyer', 'Mechanical Engineer', 'Psychologist', 'Software Developer', 'Teacher'];
+
+
+// Initial default values for the form
+const initialState = {
+  fieldOfStudy: '',
+  currentOccupation: '',
+  gender: '',
+  educationLevel: '',
+  industryGrowthRate: '',
+  familyInfluence: '',
+  age: 25,
+  yearsOfExperience: 1,
+  jobSatisfaction: 5,
+  workLifeBalance: 5,
+  jobOpportunities: 10,
+  salary: 50000,
+  jobSecurity: 5,
+  careerChangeInterest: 0,
+  skillsGap: 5,
+  mentorshipAvailable: 0,
+  certifications: 0,
+  freelancingExperience: 0,
+  geographicMobility: 0,
+  professionalNetworks: 5,
+  careerChangeEvents: 0,
+  technologyAdoption: 5,
+};
+
+function App() {
+  // React state hook to manage for data
+  const [formData, setFormData] = useState(initialState);
+  const [prediction, setPrediction] = useState<number | null>(null);
+  const [probability, setProbability] = useState<number | null>(null);
+  const [topFeatures, setTopFeatures] = useState<string[]>([])
+
+  // Handle changes in any form input field
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
+    const { name, value, type } = e.target; // Destructure input properties
+
+    let finalValue: any = value;
+
+    // Convert value to number if input type is number
+    if (type === 'number') {
+      finalValue = Number(value);
+    }
+
+    // Update form state
+    setFormData(prev => ({
+      ...prev,
+      [name]: finalValue,
+    }));
+  };
+
+  // Handle for submission
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault(); // Prevent page refresh
+
+    try {
+      const response = await fetch(`${API_URL}/predict`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const result = await response.json();
+      setPrediction(result.prediction);
+      setProbability(result.probability);
+      setTopFeatures(result.top_features || []);
+    } catch (error) {
+      console.error("Prediction error:", error);
+      alert("There was an error submitting the form. Please try again.");
+    }
+  };
+
+
+    return (
+    <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
+      <form
+        onSubmit={handleSubmit}
+        className="bg-white shadow-lg rounded-lg p-8 w-full max-w-4xl space-y-6"
+      >
+        {/* Form title */}
+        <h2 className="text-2xl font-bold text-center text-gray-800">
+          Career Change Prediction Form
+        </h2>
+
+        {/* Grid layout for text/select/number inputs */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <Select label="Field of Study" name="fieldOfStudy" value={formData.fieldOfStudy} onChange={handleChange} options={FIELDS_OF_STUDY} />
+          <Select label="Current Occupation" name="currentOccupation" value={formData.currentOccupation} onChange={handleChange} options={OCCUPATIONS} />
+          <Select label="Gender" name="gender" value={formData.gender} onChange={handleChange} options={['Male', 'Female']} />
+          <Select label="Education Level" name="educationLevel" value={formData.educationLevel} onChange={handleChange} options={["High School", "Bachelor's", "Master's", "PhD"]} />
+          <Select label="Industry Growth Rate" name="industryGrowthRate" value={formData.industryGrowthRate} onChange={handleChange} options={['High', 'Medium', 'Low']} />
+          <Select label="Family Influence" name="familyInfluence" value={formData.familyInfluence} onChange={handleChange} options={['None', 'Low', 'Medium', 'High']} />
+          <NumberInput label="Age" name="age" value={formData.age} onChange={handleChange} min={18} max={150} />
+          <NumberInput label="Years of Experience" name="yearsOfExperience" value={formData.yearsOfExperience} onChange={handleChange} min={0} max={100} />
+          <Slider label="Job Satisfaction (1–10)" name="jobSatisfaction" value={formData.jobSatisfaction} onChange={handleChange} />
+          <Slider label="Work-Life Balance (1–10)" name="workLifeBalance" value={formData.workLifeBalance} onChange={handleChange} />
+          <NumberInput label="Job Opportunities" name="jobOpportunities" value={formData.jobOpportunities} onChange={handleChange} min={0} />
+          <NumberInput label="Salary (USD)" name="salary" value={formData.salary} onChange={handleChange} min={0} step={1000} />
+          <Slider label="Job Security (1–10)" name="jobSecurity" value={formData.jobSecurity} onChange={handleChange} />
+          <SliderBin label="Career Change Interest (0-1)" name="careerChangeInterest" value={formData.careerChangeInterest} onChange={handleChange} />  
+          <Slider label="Skills Gap (1–10)" name="skillsGap" value={formData.skillsGap} onChange={handleChange} />
+          <SliderBin label="Mentorship Available" name="mentorshipAvailable" value={formData.mentorshipAvailable} onChange={handleChange} />
+          <SliderBin label="Certifications" name="certifications" value={formData.certifications} onChange={handleChange} />
+          <SliderBin label="Freelancing Experience" name="freelancingExperience" value={formData.freelancingExperience} onChange={handleChange} />
+          <SliderBin label="Geographic Mobility" name="geographicMobility" value={formData.geographicMobility} onChange={handleChange} />
+          <Slider label="Professional Networks (1–10)" name="professionalNetworks" value={formData.professionalNetworks} onChange={handleChange} />
+          <NumberInput label="Career Change Events" name="careerChangeEvents" value={formData.careerChangeEvents} onChange={handleChange} min={0} />
+          <Slider label="Technology Adoption (1–10)" name="technologyAdoption" value={formData.technologyAdoption} onChange={handleChange} />
+        </div>
+
+        {/* Submit button */}
+        <button
+          type="submit"
+          className="w-full bg-blue-600 text-white font-semibold py-2 rounded hover:bg-blue-700 transition"
+        >
+          Predict
+        </button>
+      </form>
+
+            {/* Prediction Result Display */}
+      {prediction !== null && (
+        <div className="mt-6 p-4 max-w-xl bg-white rounded shadow">
+          <div className="flex items-center space-x-3">
+            {prediction === 1 ? (
+              <FaCheckCircle {...({ className: "text-green-500 text-xl" } as any)} />
+            ) : (
+              <FaCheckCircle {...({ className: "text-green-500 text-xl" } as any)} />
+            )}
+            <h3 className="text-lg font-semibold">
+              {prediction === 1
+                ? "You're likely to change careers."
+                : "You're not likely to change careers."}
+            </h3>
+          </div>
+
+          {probability !== null && (
+            <p className="mt-2 text-gray-700">
+              Probability: <strong>{(probability * 100).toFixed(1)}%</strong>
+            </p>
+          )}
+
+          {topFeatures.length > 0 && (
+            <div className="mt-2">
+              <p className="font-medium text-gray-800">Top 3 influencing factors:</p>
+              <ul className="list-disc pl-5 text-gray-600">
+                {topFeatures.map((feature, index) => (
+                  <li key={index}>{feature}</li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+
+export default App;
+
+// ---------------------- Reusable Input Components ----------------------
+
+// Numeric input field
+
+type NumberInputProps = {
+  label: string;
+  name: string;
+  value: number;
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  min?: number;
+  max?: number;
+  step?: number;
+};
+
+const NumberInput = ({ label, name, value, onChange, min, max, step = 1 }: NumberInputProps) => (
+  <div>
+    <label htmlFor={name} className="block text-sm font-medium text-gray-700 mb-1">
+      {label}
+    </label>
+    <input
+      type="number"
+      name={name}
+      id={name}
+      value={value}
+      onChange={onChange}
+      min={min}
+      max={max}
+      step={step}
+      className="w-full border border-gray-300 rounded px-3 py-2"
+      required
+    />
+  </div>
+);
+
+// Dropdown select for categorical/binary fields
+
+type SelectProps = {
+  label: string;
+  name: string;
+  value: string;
+  onChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
+  options: string[];
+};
+
+const Select = ({ label, name, value, onChange, options }: SelectProps) => (
+  <div>
+    <label htmlFor={name} className="block text-sm font-medium text-gray-700 mb-1">
+      {label}
+    </label>
+    <select
+      name={name}
+      id={name}
+      value={value}
+      onChange={onChange}
+      className="w-full border border-gray-300 rounded px-3 py-2"
+      required
+    >
+      <option value="">Select</option>
+      {options.map(option => (
+        <option key={option} value={option}>
+          {option}
+        </option>
+      ))}
+    </select>
+  </div>
+);
+
+// Slider input for 1–10 scale features
+
+type SliderBinProps = {
+  label: string;
+  name: string;
+  value: number;
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+};
+
+const Slider = ({ label, name, value, onChange }: SliderBinProps) => (
+  <div className="flex flex-col">
+    <label htmlFor={name} className="text-sm font-medium text-gray-700 mb-1">
+      {label}: {value}
+    </label>
+    <input
+      type="range"
+      name={name}
+      id={name}
+      min={1}
+      max={10}
+      value={value}
+      onChange={onChange}
+      className="w-full"
+    />
+  </div>
+);
+
+// Slider input for 1–10 scale features
+
+type SliderProps = {
+  label: string;
+  name: string;
+  value: number;
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+};
+
+const SliderBin = ({ label, name, value, onChange }: SliderProps) => (
+  <div className="flex flex-col">
+    <label htmlFor={name} className="text-sm font-medium text-gray-700 mb-1">
+      {label}: {value}
+    </label>
+    <input
+      type="range"
+      name={name}
+      id={name}
+      min={0}
+      max={1}
+      value={value}
+      onChange={onChange}
+      className="w-full"
+    />
+  </div>
+);
+
+
+
+// function App() {
+//   const [count, setCount] = useState(0)
+
+//   return (
+//     <>
+//       <div>
+//         <a href="https://vite.dev" target="_blank">
+//           <img src={viteLogo} className="logo" alt="Vite logo" />
+//         </a>
+//         <a href="https://react.dev" target="_blank">
+//           <img src={reactLogo} className="logo react" alt="React logo" />
+//         </a>
+//       </div>
+//       <h1>Vite + React</h1>
+//       <div className="card">
+//         <button onClick={() => setCount((count) => count + 1)}>
+//           count is {count}
+//         </button>
+//         <p>
+//           Edit <code>src/App.tsx</code> and save to test HMR
+//         </p>
+//       </div>
+//       <p className="read-the-docs">
+//         Click on the Vite and React logos to learn more
+//       </p>
+//     </>
+//   )
+// }
+
+// export default App
+
+

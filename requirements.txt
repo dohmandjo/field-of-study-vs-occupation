@@ -1,25 +1,7 @@
-
----
-
-### 📦 Final `requirements.txt`
-
-```txt
-# Python core
-pandas
-numpy
-
-# PySpark ML and processing
-pyspark
-
-# FastAPI and server
-fastapi
-uvicorn
-
-# For handling form/multipart data
-python-multipart
-
-# Django database and admin
-Django>=4.2
-
-# Environment variable support
-python-dotenv
+# Runtime: training (ml/), API (api/). Needs Java 17+ for PySpark.
+pyspark>=3.5,<4
+setuptools; python_version >= "3.12"   # pyspark 3.5 still imports distutils
+numpy>=1.26
+fastapi>=0.110
+uvicorn[standard]>=0.29
+pydantic>=2.6
