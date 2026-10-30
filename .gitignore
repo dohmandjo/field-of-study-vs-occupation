@@ -1,11 +1,33 @@
 # Python
-venv/
-.venv/
 __pycache__/
-*.pyc
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.venv/
+venv/
+.ipynb_checkpoints/
+.env
 
-# Node
+# Spark / model artefacts (regenerate with `python -m ml.train`)
+models/
+metastore_db/
+derby.log
+spark-warehouse/
+
+# Derived data
+data/clean/
+*.parquet
+
+# Node (frontend has its own .gitignore too)
 node_modules/
+dist/
 
-# OS
+# OS / editor
 .DS_Store
+.idea/
+.vscode/
+
+# Old outputs from before the ml/ refactor (kept locally, no longer tracked)
+data/*.csv
+career_prediction_model/
+ui/

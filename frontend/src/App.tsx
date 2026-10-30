@@ -4,10 +4,13 @@ import React, { useState } from 'react';
 import './App.css'
 import { FaCheckCircle } from 'react-icons/fa';
 
+// Base URL of the FastAPI service (set VITE_API_URL in frontend/.env, see .env.example)
+const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:8001';
 
-// Helper function to capitalize the first letter of each word in a string
-const capitalizeWords = (str: string) =>
-  str.toLowerCase().replace(/\b\w/g, char => char.toUpperCase());
+// The model only knows these categories (see data/raw/*.csv); a dropdown avoids unseen free-text values
+const FIELDS_OF_STUDY = ['Arts', 'Biology', 'Business', 'Computer Science', 'Economics', 'Education', 'Law', 'Mechanical Engineering', 'Medicine', 'Psychology'];
+const OCCUPATIONS = ['Artist', 'Biologist', 'Business Analyst', 'Doctor', 'Economist', 'Lawyer', 'Mechanical Engineer', 'Psychologist', 'Software Developer', 'Teacher'];
+
 
 // Initial default values for the form
 const initialState = {
@@ -55,11 +58,6 @@ function App() {
       finalValue = Number(value);
     }
 
-    // Capitalize each word for specific string fields
-    if (['fieldOfStudy', 'currentOccupation'].includes(name)) {
-      finalValue = capitalizeWords(value);
-    }
-
     // Update form state
     setFormData(prev => ({
       ...prev,
@@ -72,7 +70,7 @@ function App() {
     e.preventDefault(); // Prevent page refresh
 
     try {
-      const response = await fetch("http://localhost:8000/predict", {
+      const response = await fetch(`${API_URL}/predict`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -108,8 +106,8 @@ function App() {
 
         {/* Grid layout for text/select/number inputs */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <TextInput label="Field of Study" name="fieldOfStudy" value={formData.fieldOfStudy} onChange={handleChange} />
-          <TextInput label="Current Occupation" name="currentOccupation" value={formData.currentOccupation} onChange={handleChange} />
+          <Select label="Field of Study" name="fieldOfStudy" value={formData.fieldOfStudy} onChange={handleChange} options={FIELDS_OF_STUDY} />
+          <Select label="Current Occupation" name="currentOccupation" value={formData.currentOccupation} onChange={handleChange} options={OCCUPATIONS} />
           <Select label="Gender" name="gender" value={formData.gender} onChange={handleChange} options={['Male', 'Female']} />
           <Select label="Education Level" name="educationLevel" value={formData.educationLevel} onChange={handleChange} options={["High School", "Bachelor's", "Master's", "PhD"]} />
           <Select label="Industry Growth Rate" name="industryGrowthRate" value={formData.industryGrowthRate} onChange={handleChange} options={['High', 'Medium', 'Low']} />
@@ -183,31 +181,6 @@ function App() {
 export default App;
 
 // ---------------------- Reusable Input Components ----------------------
-
-// Text input for custom strings (Field of Study, etc.)
-type TextInputProps = {
-  label: string;
-  name: string;
-  value: string;
-  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-};
-
-const TextInput = ({ label, name, value, onChange }: TextInputProps) => (
-  <div>
-    <label htmlFor={name} className="block text-sm font-medium text-gray-700 mb-1">
-      {label}
-    </label>
-    <input
-      type="text"
-      name={name}
-      id={name}
-      value={value}
-      onChange={onChange}
-      className="w-full border border-gray-300 rounded px-3 py-2"
-      required
-    />
-  </div>
-);
 
 // Numeric input field
 
