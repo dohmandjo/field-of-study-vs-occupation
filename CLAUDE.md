@@ -12,7 +12,7 @@ queried from a React form. README.md has the user-facing overview, results and e
 - `ml/train.py` - CLI; writes `models/career_change_pipeline/`, `metrics.json`, `feature_means.json`.
 - `api/main.py` - FastAPI `/predict` and `/health`; loads the saved `PipelineModel` once in the lifespan.
 - `frontend/` - Vite + React 19 + TypeScript + Tailwind 3 form.
-- `notebooks/` - 01 exploration, 02 modelling. Committed with outputs; excluded from ruff.
+- `notebooks/` - 01 exploration, 02 modeling. Committed with outputs; excluded from ruff.
 - `tests/` - pytest (schema, pipeline, API).
 - `data/raw/field_of_study_vs_occupation.csv` is the only committed data. Everything under `models/`, `data/clean/`,
   `*.parquet`, `data/*.csv` is generated and git-ignored.
